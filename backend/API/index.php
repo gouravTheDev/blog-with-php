@@ -40,15 +40,16 @@ if (isset($_GET['createPost'])) {
 	$userId = $_SESSION['userId'];
 	$userName = $_POST['userName'];
 	$postText = $_POST['postText'];
-    $stmt = $link->prepare("INSERT INTO POSTS (`USER_ID`, `USER_NAME`, `POST_TEXT`)VALUES(?, ?, ?)");
+	$postSubject = $_POST['postSubject'];
+    $stmt = $link->prepare("INSERT INTO POSTS (`USER_ID`, `USER_NAME`, `POST_SUBJECT`, `POST_TEXT`)VALUES(?, ?, ?, ?)");
 
-	$stmt->bind_param("sss", $userId, $userName, $postText);
+	$stmt->bind_param("ssss", $userId, $userName, $postSubject, $postText);
 
 	$result = $stmt->execute();
 	if ($result) {
-		$data = 'success';
+		$data = 'Successfully Created a post';
 		$myObj = new stdClass();
-		$myObj->data = $data;
+		$myObj->msg = $data;
 		$myJSON = json_encode($myObj);
 		echo $myJSON;
 	}else{
@@ -60,29 +61,45 @@ if (isset($_GET['createPost'])) {
 
 }
 
+// Read
+
 if (isset($_GET['fetchPosts'])) {
 	$userId = $_SESSION['userId'];
     $data = "";
-	$sql = "SELECT * FROM POSTS WHERE USER_ID = '$userId'";
+	$sql = "SELECT * FROM POSTS WHERE USER_ID = '$userId' ORDER BY ID DESC";
     $result = mysqli_query($link,$sql);
     if ($result) {
-    	while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)){
-    		$data = '<div>
-				<h3 style="font-weight: bold;">Posts By:- '.$row["USER_NAME"].'</h3>
-				<h4 style="font-weight: bold;">Subject:- </h4>
-				<p> </p>
-				<div class="btn-group" role="group" aria-label="Basic example">
-				 <button type="button" class="btn btn-warnign" onclick="updatePost()">Update</button>
-				 <button type="button" class="btn btn-danger" onclick="deletePost()">Update</button>
-				</div>
-			</div>';
+    	if(mysqli_num_rows($result)>0){
+    		while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)){
+	    		$data .= '<div>
+					<h4 style="font-weight: bold;">'.$row["POST_SUBJECT"].'</h4>
+					<h4>'.$row["POST_TEXT"].' </h4>
+					<p style="font-weight: bold;">Post By:- '.$row["USER_NAME"].'</p>
+					<div class="btn-group" role="group" aria-label="Basic example">
+					 <button type="button" id="updateBtn" class="btn btn-warning" onclick="update('.$row["ID"].')">Update</button>
+					 <button type="button" class="btn btn-danger" onclick="deletePost('.$row["ID"].')">Delete</button>
+					</div>
+				</div><hr>';
+			}
     	}
     }
 
+	$myObj = new stdClass();
+	$myObj->data = $data;
+	$myJSON = json_encode($myObj);
+	echo $myJSON;
+}
+
+// Delete
+
+if (isset($_GET['deletePost'])) {
+	$postId = $_POST['postId'];
+    $sql = "DELETE FROM POSTS WHERE ID='$postId'";
+	$result = mysqli_query($link,$sql);
 	if ($result) {
-		$data = 'success';
+		$data = 'Successfully Deleted a post';
 		$myObj = new stdClass();
-		$myObj->data = $data;
+		$myObj->msg = $data;
 		$myJSON = json_encode($myObj);
 		echo $myJSON;
 	}else{
