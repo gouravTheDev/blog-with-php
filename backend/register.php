@@ -1,8 +1,5 @@
 <?php 
 include 'config.php';
-$link = new mysqli(MYSQL_HOST,MYSQL_USER,MYSQL_PASS,MYSQL_DB);
-if ($link->connect_error) $errorm="connection failed: " . $link->connect_error;
-$link->set_charset("utf8");
 
 // USER-LOGIN
 
@@ -40,13 +37,11 @@ if (isset($_POST['registerSubmit'])) {
 
 			$stmt = $link->prepare("INSERT INTO USERS (`TYPE`, `NAME`, `EMAIL`, `PHONE`,`PASSWORD`)VALUES('GEN_USER', ?, ?, ?, ?)");
 
-			$stmt->bind_param("ssss", $name, $email, $phone, $password);
+			$stmt->bind_param("ssss", $name, $email, $phone, $securePassword);
 
 			$result = $stmt->execute();
 			if ($result) {
-				session_start();
-				$_SESSION['userName'] = "Hello";
-				echo '<script>window.location.href="/dashboard.php"</script>';
+				echo '<script>window.location.href="/login.php"</script>';
 			}else{
 				echo '<div style="text-align:center;">
 				Some error! Try again!
