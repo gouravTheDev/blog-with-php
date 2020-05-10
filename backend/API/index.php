@@ -63,7 +63,7 @@ if (isset($_GET['createPost'])) {
 
 // Read
 
-if (isset($_GET['fetchPosts'])) {
+if (isset($_GET['fetchSingleUserPosts'])) {
 	$userId = $_SESSION['userId'];
     $data = "";
 	$sql = "SELECT * FROM POSTS WHERE USER_ID = '$userId' ORDER BY ID DESC";
@@ -81,6 +81,8 @@ if (isset($_GET['fetchPosts'])) {
 					</div>
 				</div><hr>';
 			}
+    	}else{
+    		$data = '<div class="alert alert-warning">No Posts!</div>';
     	}
     }
 
@@ -88,6 +90,132 @@ if (isset($_GET['fetchPosts'])) {
 	$myObj->data = $data;
 	$myJSON = json_encode($myObj);
 	echo $myJSON;
+}
+
+if (isset($_GET['fetchSinglePost'])) {
+	$postId = $_GET['postId'];
+    $data = "";
+	$sql = "SELECT * FROM POSTS WHERE ID = '$postId'";
+    $result = mysqli_query($link,$sql);
+    if ($result) {
+    	if(mysqli_num_rows($result)>0){
+    		$row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    		$postSubject = $row["POST_SUBJECT"];
+    		$postText = $row["POST_TEXT"];
+    	}else{
+    		$data = '<div class="alert alert-warning">Error Occured!</div>';
+    	}
+    }
+
+	$myObj = new stdClass();
+	$myObj->postSubject = $postSubject;
+	$myObj->postText = $postText;
+	$myJSON = json_encode($myObj);
+	echo $myJSON;
+}
+
+if (isset($_GET['fetchAllPostsAdmin'])) {
+	$userId = $_SESSION['userId'];
+    $data = "";
+	$sql = "SELECT * FROM POSTS ORDER BY ID DESC";
+    $result = mysqli_query($link,$sql);
+    if ($result) {
+    	if(mysqli_num_rows($result)>0){
+    		while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)){
+	    		$data .= '<div>
+					<h4 style="font-weight: bold;">'.$row["POST_SUBJECT"].'</h4>
+					<h4>'.$row["POST_TEXT"].' </h4>
+					<p style="font-weight: bold;">Post By:- '.$row["USER_NAME"].'</p>
+					<div class="btn-group" role="group" aria-label="Basic example">';
+				if ($row["USER_ID"] == $userId) {
+					$data .= '<button type="button" id="updateBtn" class="btn btn-warning" onclick="update('.$row["ID"].')">Update</button>';
+				}
+					 
+					$data .= '<button type="button" class="btn btn-danger" onclick="deletePost('.$row["ID"].')">Delete</button>
+					</div>
+				</div><hr>';
+			}
+    	}else{
+    		$data = '<div class="alert alert-warning">No Posts!</div>';
+    	}
+    }
+
+	$myObj = new stdClass();
+	$myObj->data = $data;
+	$myJSON = json_encode($myObj);
+	echo $myJSON;
+}
+
+//FETCH ALL POSTS
+
+if (isset($_GET['fetchAllPosts'])) {
+    $data = "";
+	$sql = "SELECT * FROM POSTS ORDER BY ID DESC";
+    $result = mysqli_query($link,$sql);
+    if ($result) {
+    	if(mysqli_num_rows($result)>0){
+    		while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)){
+	    		$data .= '<div>
+					<h4 style="font-weight: bold;">'.$row["POST_SUBJECT"].'</h4>
+					<h4>'.$row["POST_TEXT"].' </h4>
+					<p style="font-weight: bold;">Post By:- '.$row["USER_NAME"].'</p>
+				</div><hr>';
+			}
+    	}else{
+    		$data = '<div class="alert alert-warning">No Posts!</div>';
+    	}
+    }
+
+	$myObj = new stdClass();
+	$myObj->data = $data;
+	$myJSON = json_encode($myObj);
+	echo $myJSON;
+}
+
+if (isset($_GET['fetchNumbers'])) {
+    $data = "";
+	$sqlPosts = "SELECT * FROM POSTS";
+	$sqlUsers = "SELECT * FROM USERS";
+    $resultPosts = mysqli_query($link,$sqlPosts);
+    $resultUsers = mysqli_query($link,$sqlUsers);
+    if ($resultPosts) {
+    	$numPosts = mysqli_num_rows($resultPosts);
+    }
+    if ($resultUsers) {
+    	$numUsers = mysqli_num_rows($resultUsers);
+    }
+
+	$myObj = new stdClass();
+	$myObj->users = $numUsers;
+	$myObj->posts = $numPosts;
+	$myJSON = json_encode($myObj);
+	echo $myJSON;
+}
+
+
+// Update
+
+if (isset($_GET['updatePost'])) {
+	$postId = $_POST['postId'];
+	$postText = $_POST['postText'];
+	$postSubject = $_POST['postSubject'];
+
+	$sql = "UPDATE POSTS SET POST_SUBJECT = '$postSubject' , POST_TEXT = '$postText' WHERE ID='$postId'";
+	$result = mysqli_query($link,$sql);
+   
+	if ($result) {
+		$data = 'Successfully Updated the post';
+		$myObj = new stdClass();
+		$myObj->msg = $data;
+		$myJSON = json_encode($myObj);
+		echo $myJSON;
+	}else{
+		$myObj = new stdClass();
+		$myObj->error = "Sorry!";
+		$myJSON = json_encode($myObj);
+		echo $myJSON;
+	}
+
 }
 
 // Delete

@@ -16,10 +16,16 @@
 	<div class="topnav" id="myTopnav">
 		<div class="container">
 			  <a href="/" class="btn btn-primary">Discussion Forum</a>
-			  <a href="questions.php" class="btn btn-primary">Questions</a>
+			  <a href="posts.php" class="btn btn-primary">All Posts</a>
 			  <?php 
-			    if(isset($_SESSION['loggedIn'])){ ?>
-			    	<a href="dashboard.php" class="btn btn-primary">Dashboard</a>
+			    if(isset($_SESSION['loggedIn'])){ 
+			    	if(isset($_SESSION['isAdmin']) && $_SESSION['isAdmin']){ ?>
+			    		<a href="adminDashboard.php" class="btn btn-primary">Dashboard</a>
+			    <?php }else{ ?>
+			    		<a href="dashboard.php" class="btn btn-primary">Dashboard</a>
+				<?php }
+
+			    ?>
 			    	<a href="logout.php" class="btn btn-primary lg-btn">Logout</a>
 				<?php }else{ ?>
 					 <a href="login.php" class="btn btn-primary lg-btn">Login</a>

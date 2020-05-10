@@ -5,7 +5,7 @@
 	<div class="alert alert-warning" id="warning" style="display: none;">Sorry! No data!</div>
 	<div class="card shadow">
 		<div class="card-body">
-			<h1 class="text-center">User Dashboard</h1><br>
+			<h1 class="text-center">Admin Dashboard</h1><br>
 			<table class="table table-bordered col-md-8 mx-auto">
 				<tr>
 					<th>User Name:-</th>
@@ -32,7 +32,7 @@
 				<textarea class="form-control" cols="4" id="postText" placeholder="Write Something"></textarea><br>
 				<button type="button" onclick="createPost();" class="btn btn-success" >Create</button>
 			</form><br>
-			<h1 class="text-center">My Posts</h1><hr>
+			<h1 class="text-center">All Posts</h1><hr>
 			<div id="postsHere"></div>
 		</div>
 	</div>
@@ -70,7 +70,7 @@
 		              	document.getElementById('userType').innerHTML = data.userType;
 		              	document.getElementById('phone').innerHTML = data.phone;
 		              	document.getElementById('email').innerHTML = data.email;
-		              	fetchPosts();
+		              	fetchAllPostsAdmin();
 		              }else{
 		              	document.getElementById('warning').style.display = "block";
 		              }
@@ -102,7 +102,7 @@
         }).then(
             function(response) {
             response.json().then(function(data) {
-            	fetchPosts();
+            	fetchAllPostsAdmin();
             	document.getElementById('successMsg').style.display = 'block';
             	document.getElementById('successMsg').innerHTML = data.msg;
             	document.getElementById('postText').value='';
@@ -119,11 +119,11 @@
 
 	// Function to Read Posts
 
-	function fetchPosts() {
+	function fetchAllPostsAdmin() {
 		// API CALL TO FETCH USER POSTS
 		document.getElementById('successMsg').style.display = 'none';
 
-		fetch('/backend/API/?fetchSingleUserPosts')
+		fetch('/backend/API/?fetchAllPostsAdmin')
 	        .then(
 	          function(response) {
 	            if (response.status !== 200) {
@@ -194,7 +194,7 @@
             function(response) {
             response.json().then(function(data) {
             	console.log(data);
-            	fetchPosts();
+            	fetchAllPostsAdmin();
             	document.getElementById('successMsg').style.display = 'block';
             	document.getElementById('successMsg').innerHTML = data.msg;
             	modal.style.display = "none";
@@ -217,7 +217,7 @@
             response.json().then(function(data) {
               	document.getElementById('successMsg').style.display = 'block';
             	document.getElementById('successMsg').innerHTML = data.msg;
-            	fetchPosts();
+            	fetchAllPostsAdmin();
             });
           }
         )

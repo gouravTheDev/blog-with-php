@@ -38,7 +38,12 @@ if (isset($_POST['loginSubmit'])) {
   		$_SESSION['userId'] = $row['ID'];
   		$_SESSION['userName'] = $row['NAME'];
   		$_SESSION['userEmail'] = $row['EMAIL'];
-  		echo '<script>window.location.href="/dashboard.php"</script>';
+  		if ($row['TYPE'] == 'ADMIN') {
+  			$_SESSION['isAdmin'] = true;
+  			echo '<script>window.location.href="/adminDashboard.php"</script>';
+  		}else{
+  			echo '<script>window.location.href="/dashboard.php"</script>';
+  		}
   	}
   }
 
